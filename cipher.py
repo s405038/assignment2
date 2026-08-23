@@ -4,10 +4,10 @@
 # function that verifies the decryption was successful.
 
 
-def shiftlogic(input, shift):
+def encryptshiftlogic(input, shift):
     """
     Gets the input and shift, calculates the shifted value
-    and if it special characters, recalculates the value to point to alphabets
+    and if it has special characters, recalculates the value to point to alphabets
 
     Parameters:
         input: The original input character.
@@ -20,6 +20,25 @@ def shiftlogic(input, shift):
     new_value = ord(input) - shift
     if new_value < ord("A"):
         new_value += 26
+
+    return chr(new_value)
+
+def decryptshiftlogic(input, shift):
+    """
+    Gets the input and shift, calculates the shifted value
+    and if it  has special characters, recalculates the value to point to alphabets
+
+    Parameters:
+        input: The original input character.
+        shift: The shift value.
+
+    Returns:
+        The shifted new value or decrypted value for the char.
+    """
+
+    new_value = ord(input) + shift
+    if new_value > ord("A"):
+        new_value -= 26
 
     return chr(new_value)
 
@@ -80,7 +99,7 @@ def encrypt(input: str, shift1: int, shift2: int):
             encrypted_text += chr(ord(char) - added_shift)
         elif char in uppercase_first_half:
             # If the letter is in the first half shift backward by shift1 positions
-            encrypted_text += shiftlogic(char, shift1)
+            encrypted_text += encryptshiftlogic(char, shift1)
         elif char in uppercase_second_half:
             # if the letter is in the second half shift forward by (shift2 squared)
             encrypted_text += chr(ord(char) + shift2 * shift2)
@@ -96,7 +115,38 @@ def encrypt(input: str, shift1: int, shift2: int):
 
 def decrypt(input,shift1, shift2):
     
-    return input
+    lowercase_first_half = "abcdefghijklmn"
+    uppercase_first_half = "ABCDEFGHIJKLMN"
+    lowercase_second_half = "opqrstuvwxyz"
+    uppercase_second_half = "OPQRSTUVWXYZ"
+
+    # calculated shifts
+    multiplied_shift = shift1 * shift2
+    added_shift = shift1 + shift2
+
+    derypted_text = ""  # initialize enc text
+
+    for char in input:
+        if char in lowercase_first_half:
+            # If the letter is in the first half of the alphabet shift backward by shift1 * shift2 positions
+            derypted_text += chr(ord(char) - multiplied_shift)
+        elif char in lowercase_second_half:
+            # If the letter is in the second half of the alphabet shift forward by shift1 + shift2 positions
+            derypted_text += chr(ord(char) + added_shift)
+        elif char in uppercase_first_half:
+            # If the letter is in the first half shift backward by shift1 positions
+            derypted_text += decryptshiftlogic(char, shift1)
+        elif char in uppercase_second_half:
+            # if the letter is in the second half shift backward by (shift2 squared)
+            derypted_text += chr(ord(char) - shift2 * shift2)
+        elif char.isdigit():
+            # Shift backward by shift1 - shift2
+            derypted_text += chr(ord(char) - shift1 - shift2)
+        else:
+            # Spaces, tabs, newlines, punctuation, symbols remain unchanged
+            derypted_text += char
+
+    return derypted_text
 
 
 def verify(firststring, secondstring):
