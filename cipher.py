@@ -23,15 +23,35 @@ def shiftlogic(input,shift):
     return chr(new_value)
 
 def encrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) :
-
-    file = open(input_path, "r")
-    input_text = file.read()
-    file.close()
-
+    input_text =  getfiletext(input_path) 
     encrypted_text=encrypt(input_text,shift1,shift2)
 
     with open(output_path, "w") as file:
         file.write(encrypted_text)
+
+def decrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) :
+    input_text = getfiletext(input_path)    
+    decrypted_text=decrypt(input_text,shift1,shift2)
+
+    with open(output_path, "w") as file:
+        file.write(decrypted_text)
+
+def getfiletext(path):
+    inputfile = open(path, "r")
+    input_text = inputfile.read()
+    inputfile.close()
+
+    return input_text
+
+
+def verify_files(original_path: str, decrypted_path: str):
+    input_text = getfiletext(original_path)    
+    output_text = getfiletext(decrypted_path) 
+    
+    if input_text==output_text:
+        return True
+    else:
+        return False
 
 def encrypt(input:str, shift1:int, shift2:int):
    
