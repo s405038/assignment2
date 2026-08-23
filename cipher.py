@@ -20,20 +20,21 @@ def shiftlogic(input,shift):
     if new_value < ord('A'):
         new_value += 26
     
-    return chr(new_value)    
+    return chr(new_value)
 
-def encrypt(input):
-    """
-    Prompts the user to enter a number.
-    Repeats the prompt until a valid whole number is entered.
+def encrypt_file(shift1: int, shift2: int, input_path: str, output_path: str) :
 
-    Parameters:
-        stringvalue: The name displayed in the input prompt.
+    file = open(input_path, "r")
+    input_text = file.read()
+    file.close()
 
-    Returns:
-        The validated input as an integer.
-    """
+    encrypted_text=encrypt(input_text,shift1,shift2)
 
+    with open(output_path, "w") as file:
+        file.write(encrypted_text)
+
+def encrypt(input:str, shift1:int, shift2:int):
+   
     lowercase_first_half ='abcdefghijklmn'
     uppercase_first_half ='ABCDEFGHIJKLMN'
     lowercase_second_half ='opqrstuvwxyz'
@@ -79,6 +80,17 @@ def verify(firststring, secondstring):
         return False
 
 def validateinput(stringvalue):
+    """
+    Prompts the user to enter a number.
+    Repeats the prompt until a valid whole number is entered.
+
+    Parameters:
+        stringvalue: The name displayed in the input prompt.
+
+    Returns:
+        The validated input as an integer.
+    """
+     
     user_input = input("Enter a number for " + stringvalue + ": ")
 
     while not user_input.isdigit():
@@ -90,13 +102,14 @@ def validateinput(stringvalue):
 
 shift1=validateinput("shift1")
 shift2=validateinput("shift2")
+encrypt_file(shift1, shift2, "raw_text.txt", "encrypted_text.txt")
+print("Generated encrypted file")
 
-input_text="a1A fxP"
-
-encry_text=encrypt(input_text)
-print(encry_text)
-decrypted_text=decrypt(encry_text)
-print(verify(encry_text,decrypted_text))
+#input_text="a1A fxP"
+#encry_text=encrypt(input_text)
+#print(encry_text)
+#decrypted_text=decrypt(encry_text)
+#print(verify(encry_text,decrypted_text))
 
 
 
