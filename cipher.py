@@ -179,7 +179,7 @@ def validate_input(string_value):
 
     return int(user_input)
 
-print("*****************************************")
+print("\n*****************************************")
 print("\nQuestion 1: Encryption/Decryption logic")
 print("\n*****************************************\n")
 
@@ -191,7 +191,7 @@ print("Generated encrypted file successfully")
 decrypt_file(shift1, shift2, "encrypted_text.txt", "decrypted_text.txt")
 print("Generated decrypted file successfully")
 
-print("*****************************************")
+print("\n*****************************************")
 print("\nEnd-result: ")
 print("\n-----------------------------------------\n")
 
