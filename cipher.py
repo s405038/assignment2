@@ -108,6 +108,8 @@ def encrypt_or_decrypt_logic(input, shift1, shift2, type):
     Spaces, punctuation, and other special characters remain unchanged.
 
     Also, accepts "enc" or "dec" as type to do encryption or subsequent decryption
+
+    Returns the encrypted or decrypted text
     """
 
     # different character sets
