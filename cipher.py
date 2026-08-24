@@ -186,10 +186,10 @@ print("\n*****************************************\n")
 shift1 = validate_input("shift1")
 shift2 = validate_input("shift2")
 encrypt_file(shift1, shift2, "raw_text.txt", "encrypted_text.txt")
-print("Generated encrypted file successfully")
+print("\n- Generated encrypted file successfully")
 
 decrypt_file(shift1, shift2, "encrypted_text.txt", "decrypted_text.txt")
-print("Generated decrypted file successfully")
+print("- Generated decrypted file successfully")
 
 print("\n*****************************************")
 print("\nEnd-result: ")
