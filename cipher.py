@@ -168,14 +168,14 @@ def validate_input(string_value):
         string_value: The name displayed in the input prompt.
 
     Returns:
-        The validated input as an integer.
+        The validated input as a positive integer.
     """
 
-    user_input = input("Enter a number for " + string_value + ": ")
+    user_input = input("Enter a non-negative number for " + string_value + ": ")
 
     while not user_input.isdigit():
-        print("Invalid input. Please enter numbers only.")
-        user_input = input("Enter a number for " + string_value + ": ")
+        print("Invalid input. Please enter non-negative numbers only.")
+        user_input = input("Enter a non-negative number for " + string_value + ": ")
 
     return int(user_input)
 
