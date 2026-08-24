@@ -1,7 +1,7 @@
 """
 cipher.py reads the text file raw_text.txt,
-encrypts its contents using the described scheme, and writes the result to
-encrypted_text.txt. It then has a function that decrypts that file, and a
+encrypts its contents using the described Encryption logic, and writes the result to
+encrypted_text.txt. It then decrypts encrypted_text.txt file and writes to decrypted_text.txt, and a
 function that verifies the decryption was successful.
 
 Encryption logic -
