@@ -179,6 +179,10 @@ def validate_input(string_value):
 
     return int(user_input)
 
+print("*****************************************")
+print("\nQuestion 1: Encryption/Decryption logic")
+print("\n*****************************************\n")
+
 shift1 = validate_input("shift1")
 shift2 = validate_input("shift2")
 encrypt_file(shift1, shift2, "raw_text.txt", "encrypted_text.txt")
@@ -187,14 +191,14 @@ print("Generated encrypted file successfully")
 decrypt_file(shift1, shift2, "encrypted_text.txt", "decrypted_text.txt")
 print("Generated decrypted file successfully")
 
-if verify_files("raw_text.txt", "decrypted_text.txt")==True:
-    print("Decryption verification successful")
-else:
-    print("Decryption verification failed")
-    
+print("*****************************************")
+print("\nEnd-result: ")
+print("\n-----------------------------------------\n")
 
-# input_text="a1A fxP"
-# encry_text=encrypt(input_text)
-# print(encry_text)
-# decrypted_text=decrypt(encry_text)
-# print(verify(encry_text,decrypted_text))
+if verify_files("raw_text.txt", "decrypted_text.txt")==True:
+    print("\033[92mDecryption verification successful\033[0m")
+else:
+    print("\033[91mDecryption verification failed\033[0m") 
+
+print("\n-----------------------------------------\n")   
+
