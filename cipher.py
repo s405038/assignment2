@@ -174,8 +174,8 @@ def validate_input(string_value):
     user_input = input("Enter a non-negative number for " + string_value + ": ")
 
     while not user_input.isdigit():
-        print("Invalid input. Please enter non-negative numbers only.")
-        user_input = input("Enter a non-negative number for " + string_value + ": ")
+        print("Invalid input. Please enter non-negative whole numbers only.")
+        user_input = input("Enter a non-negative whole number for " + string_value + ": ")
 
     return int(user_input)
 
