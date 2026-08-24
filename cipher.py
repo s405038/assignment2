@@ -121,7 +121,7 @@ def encrypt_or_decrypt_logic(input, shift1, shift2, type):
 
     output_text = ""  # initialize the var that will hold the text
 
-    match type:
+    match type:  # i love switch case because it is efficient
         case "enc":
             for char in input:
                 if char in lowercase_first_half:
