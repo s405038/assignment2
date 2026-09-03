@@ -77,4 +77,144 @@ position = 0
 
 print(parse_primary())
 
-# Testing pushing git extensions 2.
+def parse_unary():
+    token_type, value = current_token()
+
+    if token_type == "OP" and value == "-":
+        advance()
+        operand = parse_unary()
+        return ("neg", operand)
+
+    if token_type == "OP" and value == "+":
+        raise ValueError("Unary plus not supported")
+
+    return parse_primary()
+
+tokens = tokenize("-5")
+position = 0
+
+print(parse_unary())
+
+def parse_power():
+    left = parse_unary()
+    
+    token_type, value = current_token()
+
+    if token_type == "OP" and value == "^":
+        advance()
+
+        right = parse_power()
+
+        return ("^", left, right)
+
+    return left
+
+def parse_term():
+    left = parse_power()
+
+    while True:
+        token_type, value = current_token()
+
+        if token_type == "OP" and value in ("*", "/", "%"):
+            advance()
+            right = parse_power()
+            left = (value, left, right)
+        else:
+            break
+
+    return left
+
+
+def parse_expression():
+    left = parse_term()
+
+    while True:
+        token_type, value = current_token()
+
+        if token_type == "OP" and value in ("+", "-"):
+            advance()
+            right = parse_term()
+            left = (value, left, right)
+        else:
+            break
+
+    return left
+
+
+tokens = tokenize("2 + 3 * 4")
+position = 0
+
+tree = parse_expression()
+
+print(tree)
+
+def evaluate(node):
+    if isinstance(node, str):
+        return float(node)
+
+    if node[0] == "neg":
+        return -evaluate(node[1])
+
+    op = node[0]
+
+    left = evaluate(node[1])
+    right = evaluate(node[2])
+
+    if op == "+":
+        return left + right
+
+    if op == "-":
+        return left - right
+
+    if op == "*":
+        return left * right
+
+    if op == "/":
+        if right == 0:
+            raise ValueError("Division by zero")
+        return left / right
+
+    if op == "%":
+        if right == 0:
+            raise ValueError("Modulo by zero")
+        return left % right
+
+    if op == "^":
+        return left ** right
+
+raise ValueError("Unknown operator")
+
+tokens = tokenize("2 + 3 * 4")
+position = 0
+
+tree = parse_expression()
+
+print(tree)
+print(evaluate(tree))
+
+def tree_to_string(node):
+    if isinstance(node, str):
+        return node
+
+    if node[0] == "neg":
+        return f"(neg {tree_to_string(node[1])})"
+
+    return (
+        f"({node[0]} "
+        f"{tree_to_string(node[1])} "
+        f"{tree_to_string(node[2])})"
+
+)
+
+tokens = tokenize("2 + 3 * 4")
+position = 0
+
+tree = parse_expression()
+
+print(tree_to_string(tree))
+
+def format_result(value):
+    if value == int(value):
+        return str(int(value))
+    
+    return str(round(value, 4))
