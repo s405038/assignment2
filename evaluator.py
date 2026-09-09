@@ -218,3 +218,30 @@ def format_result(value):
         return str(int(value))
     
     return str(round(value, 4))
+
+def process_expression(expression):
+    global tokens
+    global position
+
+    try:
+        tokens = tokenize(expression)
+        position = 0
+
+        tree = parse_expression()
+
+        result = evaluate(tree)
+
+        return {
+            "input": expression,
+            "tree": tree_to_string(tree),
+            "tokens": tokens,
+            "result": result
+        }
+
+    except Exception:
+        return {
+            "input": expression,
+            "tree": "ERROR",
+            "tokens": "ERROR",
+            "result": "ERROR"
+}
