@@ -4,6 +4,12 @@
 # Part C: Evaluator
 # Part D: File Processing
 
+import os
+
+tokens = []
+position = 0
+
+
 def tokenize(expression):
     tokens = []
     i = 0
@@ -17,10 +23,23 @@ def tokenize(expression):
         elif char.isdigit():
             number = char
             i += 1
+            decimal_seen = False
 
-            while i < len(expression) and expression[i].isdigit():
-                number += expression[i]
-                i += 1
+            while i < len(expression):
+                if expression[i].isdigit():
+                    number += expression[i]
+                    i += 1
+
+                elif expression[i] == "." and not decimal_seen:
+                    decimal_seen = True
+                    number += "."
+                    i += 1
+
+                else:
+                    break
+
+            if number.endswith("."):
+                raise ValueError("Invalid number")
 
             tokens.append(("NUM", number))
 
@@ -40,17 +59,17 @@ def tokenize(expression):
             raise ValueError("Invalid character")
 
     tokens.append(("END", ""))
-
     return tokens
 
-print(tokenize("3 + 5"))  # Example usage of the tokenizer function
 
 def current_token():
     return tokens[position]
 
+
 def advance():
     global position
     position += 1
+
 
 def parse_primary():
     token_type, value = current_token()
@@ -65,60 +84,67 @@ def parse_primary():
         node = parse_expression()
 
         if current_token()[0] != "RPAREN":
-            raise ValueError("Missing closing parenthesis")
+            raise ValueError("Missing ')'")
 
         advance()
         return node
 
     raise ValueError("Expected number or parenthesis")
 
-tokens = tokenize("5")
-position = 0
 
-print(parse_primary())
+def parse_power():
+    left = parse_primary()
+
+    token_type, value = current_token()
+
+    if token_type == "OP" and value == "^":
+        advance()
+        right = parse_power()
+        return ("^", left, right)
+
+    return left
+
 
 def parse_unary():
     token_type, value = current_token()
 
     if token_type == "OP" and value == "-":
         advance()
-        operand = parse_unary()
-        return ("neg", operand)
+        return ("neg", parse_unary())
 
     if token_type == "OP" and value == "+":
         raise ValueError("Unary plus not supported")
 
-    return parse_primary()
+    return parse_power()
 
-tokens = tokenize("-5")
-position = 0
 
-print(parse_unary())
+def starts_factor(token_type):
+    return token_type in ("NUM", "LPAREN")
 
-def parse_power():
-    left = parse_unary()
-    
-    token_type, value = current_token()
-
-    if token_type == "OP" and value == "^":
-        advance()
-
-        right = parse_power()
-
-        return ("^", left, right)
-
-    return left
 
 def parse_term():
-    left = parse_power()
+    left = parse_unary()
 
     while True:
         token_type, value = current_token()
 
         if token_type == "OP" and value in ("*", "/", "%"):
             advance()
-            right = parse_power()
+            right = parse_unary()
             left = (value, left, right)
+
+        elif starts_factor(token_type):
+            if (
+                isinstance(left, str)
+                and token_type == "NUM"
+            ):
+                raise ValueError(
+                    "Adjacent numbers are not implicit multiplication"
+                )
+
+            right = parse_unary()
+            left = ("*", left, right)
+
         else:
             break
 
@@ -135,18 +161,12 @@ def parse_expression():
             advance()
             right = parse_term()
             left = (value, left, right)
+
         else:
             break
 
     return left
 
-
-tokens = tokenize("2 + 3 * 4")
-position = 0
-
-tree = parse_expression()
-
-print(tree)
 
 def evaluate(node):
     if isinstance(node, str):
@@ -182,19 +202,21 @@ def evaluate(node):
     if op == "^":
         return left ** right
 
-raise ValueError("Unknown operator")
+    raise ValueError("Unknown operator")
 
-tokens = tokenize("2 + 3 * 4")
-position = 0
 
-tree = parse_expression()
+def format_number(value):
+    value = float(value)
 
-print(tree)
-print(evaluate(tree))
+    if value.is_integer():
+        return str(int(value))
+
+    return f"{value:.4f}".rstrip("0").rstrip(".")
+
 
 def tree_to_string(node):
     if isinstance(node, str):
-        return node
+        return format_number(float(node))
 
     if node[0] == "neg":
         return f"(neg {tree_to_string(node[1])})"
@@ -203,21 +225,30 @@ def tree_to_string(node):
         f"({node[0]} "
         f"{tree_to_string(node[1])} "
         f"{tree_to_string(node[2])})"
+    )
 
-)
 
-tokens = tokenize("2 + 3 * 4")
-position = 0
+def format_tokens(token_list):
+    parts = []
 
-tree = parse_expression()
+    for token_type, value in token_list:
+        if token_type == "END":
+            parts.append("[END]")
+        else:
+            parts.append(f"[{token_type}:{value}]")
 
-print(tree_to_string(tree))
+    return " ".join(parts)
+
 
 def format_result(value):
-    if value == int(value):
+    if value == "ERROR":
+        return "ERROR"
+
+    if float(value).is_integer():
         return str(int(value))
-    
-    return str(round(value, 4))
+
+    return f"{value:.4f}"
+
 
 def process_expression(expression):
     global tokens
@@ -229,12 +260,15 @@ def process_expression(expression):
 
         tree = parse_expression()
 
+        if current_token()[0] != "END":
+            raise ValueError("Unexpected token")
+
         result = evaluate(tree)
 
         return {
             "input": expression,
             "tree": tree_to_string(tree),
-            "tokens": tokens,
+            "tokens": format_tokens(tokens),
             "result": result
         }
 
@@ -244,4 +278,52 @@ def process_expression(expression):
             "tree": "ERROR",
             "tokens": "ERROR",
             "result": "ERROR"
-}
+        }
+
+
+def write_output(input_path, results):
+    output_path = os.path.join(
+        os.path.dirname(input_path),
+        "output.txt"
+    )
+
+    with open(output_path, "w") as outfile:
+        for item in results:
+
+            outfile.write(
+                f"Input: {item['input']}\n"
+            )
+
+            outfile.write(
+                f"Tree: {item['tree']}\n"
+            )
+
+            outfile.write(
+                f"Tokens: {item['tokens']}\n"
+            )
+
+            outfile.write(
+                f"Result: {format_result(item['result'])}\n\n"
+            )
+
+
+def evaluate_file(input_path: str) -> listresults = []
+
+    with open(input_path, "r") as infile:
+        expressions = [
+            line.rstrip("\n")
+            for line in infile
+        ]
+
+    for expression in expressions:
+        results.append(
+            process_expression(expression)
+        )
+
+    write_output(input_path, results)
+
+    return results
+
+
+if __name__ == "__main__":
+    evaluate_file("input.txt")
